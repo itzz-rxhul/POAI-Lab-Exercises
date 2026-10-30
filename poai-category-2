@@ -1,0 +1,203 @@
+# Continuous Environment Agent
+# Environment has infinite/smooth possible values (like real-world position or speed)
+ 
+class ContinuousEnvAgent:
+    def act(self, position):
+        next_pos = position + 0.5  # can move by any fractional amount
+        print(f"Continuous move: moving from position {position} to {next_pos}")
+        return next_pos
+ 
+ 
+# Demo
+agent = ContinuousEnvAgent()
+pos = 0.0
+while pos < 2.0:
+    pos = agent.act(pos)
+ 
+print("Reached target range!")
+ class CalculatorAgent:
+
+    def add(self, a, b):
+        return a + b
+
+agent = CalculatorAgent()
+
+print("Answer =", agent.add(15, 25))# Discrete Environment Agent
+# Environment has a limited, countable set of states (like steps on a grid)
+ 
+class DiscreteEnvAgent:
+    def __init__(self):
+        self.states = [1, 2, 3, 4, 5]  # fixed, countable positions
+ 
+    def act(self, position):
+        next_pos = position + 1
+        print(f"Discrete step: moving from state {position} to state {next_pos}")
+        return next_pos
+ 
+ 
+# Demo
+agent = DiscreteEnvAgent()
+pos = 1
+while pos < 5:
+    pos = agent.act(pos)
+ 
+print("Reached final state!")
+'''
+import random
+import time
+
+class SelfDrivingCar:
+
+    def drive(self):
+        for i in range(5):
+            signal = random.choice(["Green", "Red"])
+            print("Traffic Signal:", signal)
+
+            if signal == "Green":
+                print("Car Moving")
+            else:
+                print("Car Stopped")
+
+            time.sleep(1)
+
+car = SelfDrivingCar()
+car.drive()
+class VacuumAgent:
+    def __init__(self):
+        self.environment = {
+            "A": "Dirty",
+            "B": "Clean"
+        }
+
+    def display(self):
+        print("Current Environment:")
+        for room, state in self.environment.items():
+            print(room, ":", state)
+
+    def clean(self):
+        for room in self.environment:
+            if self.environment[room] == "Dirty":
+                print("Cleaning Room", room)
+                self.environment[room] = "Clean"
+            else:
+                print("Room", room, "is already clean")
+
+agent = VacuumAgent()
+
+agent.display()
+agent.clean()
+agent.display()
+import random
+
+class DroneAgent:
+
+    def __init__(self):
+        self.locations = {
+            "Warehouse": "Unknown",
+            "Customer": "Unknown"
+        }
+
+    def observe(self):
+        place = random.choice(list(self.locations.keys()))
+        status = random.choice(["Clear", "Blocked"])
+        self.locations[place] = status
+        print("Observed:", place, "=", status)
+
+    def decide(self):
+        if self.locations["Customer"] == "Clear":
+            print("Deliver Package")
+        else:
+            print("Wait for better visibility")
+
+agent = DroneAgent()
+
+for i in range(3):
+    agent.observe()
+
+agent.decide()
+class SequentialAgent:
+    def __init__(self):
+        self.history = []  # remembers past moves
+ 
+    def act(self, move):
+        self.history.append(move)
+        print(f"Move: {move} | Full history so far: {self.history}")
+ 
+ 
+# Demo (like a chess game - each move depends on previous ones)
+agent = SequentialAgent()
+agent.act("e4")
+agent.act("e5")
+agent.act("Nf3")
+
+class MazeRobot:
+
+    def move(self):
+        print("Moving through fixed maze...")
+        print("Path:")
+        print("(0,0) -> (0,1) -> (0,2) -> (1,2) -> (2,2)")
+        print("Goal Reached")
+
+robot = MazeRobot()
+robot.move()
+import random
+
+class WeatherAgent:
+
+    def predict(self):
+        weather = random.choice([
+            "Sunny",
+            "Rainy",
+            "Cloudy",
+            "Storm"
+        ])
+
+        print("Predicted Weather:", weather)
+
+agent = WeatherAgent()
+
+for i in range(5):
+    agent.predict()
+class EpisodicAgent:
+    def act(self, image):
+        # each image is a fresh, unrelated episode
+        print(f"New episode. Classifying image: {image} (no memory of past images)")
+        return "cat" if "cat" in image else "not cat"
+ 
+ 
+# Demo
+agent = EpisodicAgent()
+agent.act("cat_photo.jpg")
+agent.act("dog_photo.jpg")
+agent.act("cat_photo2.jpg")
+
+class KnownEnvAgent:
+    def __init__(self):
+        self.map = {"A": "B", "B": "C", "C": "Goal"}
+ 
+    def act(self, position):
+        print(f"I know the map. Moving from {position} to {self.map[position]}")
+        return self.map[position]
+ 
+ 
+# Demo
+agent = KnownEnvAgent()
+pos = "A"
+while pos != "Goal":
+    pos = agent.act(pos)
+ 
+print("Reached the goal!")
+
+class UnknownEnvAgent:
+    def act(self, position, sensed_options):
+        print(f"I don't know the map. At {position}, I sense: {sensed_options}")
+        choice = sensed_options[0]
+        print(f"Exploring towards: {choice}")
+        return choice
+ 
+ 
+# Demo
+agent = UnknownEnvAgent()
+agent.act("A", ["B", "D"])
+ 
+ 
