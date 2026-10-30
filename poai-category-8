@@ -1,0 +1,249 @@
+#1.Medical Diagnosis using Forward Chaining
+facts = {
+    "fever": True,
+    "cough": True,
+    "headache": True,
+    "body_pain": True,
+    "sore_throat": True,
+    "sneezing": False,
+    "fatigue": True,
+    "breathing_difficulty": False
+}
+rules = [
+    {
+        "symptoms": ["fever", "cough", "body_pain"],
+        "diagnosis": "Possible flu-like illness"
+    },
+    {
+        "symptoms": ["cough", "sore_throat", "sneezing"],
+        "diagnosis": "Possible common cold"
+    },
+    {
+        "symptoms": ["fever", "sore_throat", "headache"],
+        "diagnosis": "Possible throat infection"
+    },
+    {
+        "symptoms": ["fever", "fatigue", "headache"],
+        "diagnosis": "Possible viral illness"
+    },
+    {
+        "symptoms": ["cough", "breathing_difficulty"],
+        "diagnosis": "Respiratory symptoms requiring medical assessment"
+    }
+]
+print("MEDICAL DIAGNOSIS SYSTEM")
+print("------------------------")
+print("Patient Symptoms:")
+
+for symptom, present in facts.items():
+    if present:
+        print("-", symptom.replace("_", " ").title())
+print("\nApplying Forward Chaining...")
+print("\nPossible Diagnosis:")
+
+diagnoses_found = []
+
+for rule in rules:
+    match = True
+    for symptom in rule["symptoms"]:
+        if facts.get(symptom, False) is False:
+            match = False
+            break
+    if match:
+        diagnoses_found.append(rule["diagnosis"])
+        print("->", rule["diagnosis"])
+
+print("\nFinal Result:")
+
+if diagnoses_found:
+    print("Matching rules were found.")
+    print("Number of matching rules:", len(diagnoses_found))
+else:
+    print("No matching rules were found.")
+     
+MEDICAL DIAGNOSIS SYSTEM
+------------------------
+Patient Symptoms:
+- Fever
+- Cough
+- Headache
+- Body Pain
+- Sore Throat
+- Fatigue
+
+Applying Forward Chaining...
+
+Possible Diagnosis:
+-> Possible flu-like illness
+-> Possible throat infection
+-> Possible viral illness
+
+Final Result:
+Matching rules were found.
+Number of matching rules: 3
+
+#2.Autonomous Vehicle using Forward Chaining
+facts = {
+    "obstacle_detected": True,
+    "traffic_light_red": False,
+    "traffic_light_green": True,
+    "pedestrian_detected": False,
+    "road_clear": True,
+    "speed_limit_exceeded": False,
+    "emergency_vehicle_detected": False
+}
+
+rules = [
+    {
+        "conditions": ["obstacle_detected"],
+        "action": "STOP"
+    },
+    {
+        "conditions": ["traffic_light_red"],
+        "action": "STOP"
+    },
+    {
+        "conditions": ["pedestrian_detected"],
+        "action": "STOP"
+    },
+    {
+        "conditions": ["emergency_vehicle_detected"],
+        "action": "SLOW DOWN"
+    },
+    {
+        "conditions": ["speed_limit_exceeded"],
+        "action": "REDUCE SPEED"
+    },
+    {
+        "conditions": ["traffic_light_green", "road_clear"],
+        "action": "MOVE FORWARD"
+    }
+]
+print("AUTONOMOUS VEHICLE SYSTEM")
+print("-------------------------")
+print("Sensor Information:")
+
+for sensor, value in facts.items():
+    print(sensor.replace("_", " ").title(), ":", value)
+
+print("\nApplying Forward Chaining...")
+actions = []
+
+for rule in rules:
+    if all(facts.get(condition, False)
+           for condition in rule["conditions"]):
+        actions.append(rule["action"])
+
+print("\nVehicle Decision:")
+
+if "STOP" in actions:
+    print("Action: STOP")
+elif "SLOW DOWN" in actions:
+    print("Action: SLOW DOWN")
+elif "REDUCE SPEED" in actions:
+    print("Action: REDUCE SPEED")
+elif "MOVE FORWARD" in actions:
+    print("Action: MOVE FORWARD")
+else:
+    print("Action: WAIT AND CHECK CONDITIONS")
+
+print("\nResult: Decision generated using forward chaining.")
+     
+AUTONOMOUS VEHICLE SYSTEM
+-------------------------
+Sensor Information:
+Obstacle Detected : True
+Traffic Light Red : False
+Traffic Light Green : True
+Pedestrian Detected : False
+Road Clear : True
+Speed Limit Exceeded : False
+Emergency Vehicle Detected : False
+
+Applying Forward Chaining...
+
+Vehicle Decision:
+Action: STOP
+
+Result: Decision generated using forward chaining.
+
+
+#3.Industrial Manufacturing Using Backward Chaining
+facts = {
+    "raw_material_available": True,
+    "machine_available": True,
+    "skilled_worker_available": True,
+    "power_supply_available": True,
+    "quality_check_passed": True
+}
+rules = {
+    "manufacturing_possible": [
+        "raw_material_available",
+        "machine_available",
+        "skilled_worker_available",
+        "power_supply_available"
+    ],
+    "product_ready": [
+        "manufacturing_possible",
+        "quality_check_passed"
+    ]
+}
+
+def backward_chaining(goal):
+    print("Checking goal:", goal)
+
+    if goal in facts:
+        if facts[goal]:
+            print(goal, "is available.")
+            return True
+        else:
+            print(goal, "is not available.")
+            return False
+
+    if goal in rules:
+        for condition in rules[goal]:
+            print("Checking condition:", condition)
+
+            if not backward_chaining(condition):
+                print("Goal", goal, "cannot be achieved.")
+                return False
+
+        print("Goal", goal, "is achieved.")
+        return True
+
+    print("No rule found for", goal)
+    return False
+goal = "product_ready"
+
+print("INDUSTRIAL MANUFACTURING SYSTEM")
+print("--------------------------------")
+
+if backward_chaining(goal):
+    print("\nResult: Product is ready for delivery.")
+else:
+    print("\nResult: Manufacturing requirements are not satisfied.")
+     
+INDUSTRIAL MANUFACTURING SYSTEM
+--------------------------------
+Checking goal: product_ready
+Checking condition: manufacturing_possible
+Checking goal: manufacturing_possible
+Checking condition: raw_material_available
+Checking goal: raw_material_available
+raw_material_available is available.
+Checking condition: machine_available
+Checking goal: machine_available
+machine_available is available.
+Checking condition: skilled_worker_available
+Checking goal: skilled_worker_available
+skilled_worker_available is available.
+Checking condition: power_supply_available
+Checking goal: power_supply_available
+power_supply_available is available.
+Goal manufacturing_possible is achieved.
+Checking condition: quality_check_passed
+Checking goal: quality_check_passed
+quality_check_passed is available.
+Goal product_ready is achieved.
+
+Result: Product is ready for delivery.
