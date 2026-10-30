@@ -1,0 +1,107 @@
+'''
+# ----------------------------------------
+# Goal-Based Agent - Robot Navigation
+# ----------------------------------------
+
+class RobotAgent:
+
+    def __init__(self, start, goal):
+        self.position = start
+        self.goal = goal
+
+    def move(self):
+
+        while self.position != self.goal:
+
+            if self.position < self.goal:
+                self.position += 1
+                print("Robot moved Forward ->", self.position)
+
+            elif self.position > self.goal:
+                self.position -= 1
+                print("Robot moved Backward ->", self.position)
+
+        print("\nGoal Reached Successfully!")
+
+
+print("=== Goal Based Agent ===")
+
+start = int(input("Enter Starting Position: "))
+goal = int(input("Enter Goal Position: "))
+
+robot = RobotAgent(start, goal)
+
+robot.move()
+# ----------------------------------------
+# Model-Based Agent - Traffic Signal
+# ----------------------------------------
+
+class TrafficSignalAgent:
+
+    def __init__(self):
+        self.current_signal = "Red"
+
+    def display(self):
+        print("Current Signal:", self.current_signal)
+
+    def next_signal(self):
+        if self.current_signal == "Red":
+            self.current_signal = "Green"
+
+        elif self.current_signal == "Green":
+            self.current_signal = "Yellow"
+
+        elif self.current_signal == "Yellow":
+            self.current_signal = "Red"
+
+
+agent = TrafficSignalAgent()
+
+print("=== Traffic Signal Simulation ===")
+
+for i in range(6):
+    agent.display()
+    input("Press Enter to change signal...")
+    agent.next_signal()
+
+print("Simulation Finished")
+# ----------------------------------------
+# Simple Reflex Agent - Automatic Door
+# ----------------------------------------
+
+def simple_reflex_agent():
+    print("=== Automatic Door System ===")
+
+    person = input("Is a person near the door? (yes/no): ").lower()
+
+    if person == "yes":
+        print("Action: Door Opened")
+    elif person == "no":
+        print("Action: Door Closed")
+    else:
+        print("Invalid Input")
+
+# Main Program
+simple_reflex_agent()
+# ----------------------------------------
+# Utility-Based Agent - Restaurant Selection
+# ----------------------------------------
+
+restaurants = {
+    "Restaurant A": 70,
+    "Restaurant B": 95,
+    "Restaurant C": 82,
+    "Restaurant D": 88
+}
+
+print("=== Restaurant Recommendation ===")
+
+print("\nAvailable Restaurants\n")
+
+for name, utility in restaurants.items():
+    print(name, "-> Utility Score:", utility)
+
+best = max(restaurants, key=restaurants.get)
+
+print("\nBest Restaurant:", best)
+print("Utility Score:", restaurants[best])
