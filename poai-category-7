@@ -1,0 +1,243 @@
+#1.Map-Coloring
+
+colors = ["Red", "Green", "Blue"]
+
+graph = {
+    "A": ["B", "C"],
+    "B": ["A", "C", "D"],
+    "C": ["A", "B", "D"],
+    "D": ["B", "C"]
+}
+
+step = 0
+
+def is_safe(node, color, assignment):
+    for neighbor in graph[node]:
+        if neighbor in assignment and assignment[neighbor] == color:
+            return False
+    return True
+
+
+def map_coloring(assignment):
+    global step
+
+    if len(assignment) == len(graph):
+        print("\nAll nodes are colored!")
+        return assignment
+    node = next(n for n in graph if n not in assignment)
+
+    print("\nSelecting node:", node)
+
+    for color in colors:
+        step += 1
+
+        print("\nStep", step)
+        print("Trying", node, "=", color)
+
+        if is_safe(node, color, assignment):
+            print("Result: SAFE")
+
+            assignment[node] = color
+
+            print("Current assignment:", assignment)
+
+            result = map_coloring(assignment)
+
+            if result:
+                return result
+
+
+            print("Backtracking from", node)
+            del assignment[node]
+
+        else:
+            print("Result: CONFLICT")
+
+solution = map_coloring({})
+
+print("\n-----------------------------")
+print("Final Map Coloring Solution")
+print("-----------------------------")
+print(solution)
+     
+Selecting node: A
+
+Step 1
+Trying A = Red
+Result: SAFE
+Current assignment: {'A': 'Red'}
+
+Selecting node: B
+
+Step 2
+Trying B = Red
+Result: CONFLICT
+
+Step 3
+Trying B = Green
+Result: SAFE
+Current assignment: {'A': 'Red', 'B': 'Green'}
+
+Selecting node: C
+
+Step 4
+Trying C = Red
+Result: CONFLICT
+
+Step 5
+Trying C = Green
+Result: CONFLICT
+
+Step 6
+Trying C = Blue
+Result: SAFE
+Current assignment: {'A': 'Red', 'B': 'Green', 'C': 'Blue'}
+
+Selecting node: D
+
+Step 7
+Trying D = Red
+Result: SAFE
+Current assignment: {'A': 'Red', 'B': 'Green', 'C': 'Blue', 'D': 'Red'}
+
+All nodes are colored!
+
+-----------------------------
+Final Map Coloring Solution
+-----------------------------
+{'A': 'Red', 'B': 'Green', 'C': 'Blue', 'D': 'Red'}
+
+#2.Crypt-Arthimetic problem
+from itertools import permutations
+
+word1 = input().strip()
+word2 = input().strip()
+result = input().strip()
+
+letters = set(word1 + word2 + result)
+
+if len(letters) > 10:
+    print("No solution")
+    exit()
+
+leading = {word1[0], word2[0], result[0]}
+
+def value(word, mapping):
+    num = 0
+    for ch in word:
+        num = num * 10 + mapping[ch]
+    return num
+
+found = False
+
+for digits in permutations(range(10), len(letters)):
+    mapping = dict(zip(letters, digits))
+
+    if any(mapping[ch] == 0 for ch in leading):
+        continue
+
+    num1 = value(word1, mapping)
+    num2 = value(word2, mapping)
+    num3 = value(result, mapping)
+
+    if num1 + num2 == num3:
+        print("Solution:")
+        for ch in sorted(mapping):
+            print(ch, "=", mapping[ch])
+
+        print(word1, "=", num1)
+        print(word2, "=", num2)
+        print(result, "=", num3)
+
+        found = True
+        break
+
+if not found:
+    print("No solution")
+     
+two
+two
+four
+Solution:
+f = 1
+o = 4
+r = 8
+t = 7
+u = 6
+w = 3
+two = 734
+two = 734
+four = 1468
+
+#Local Search for CSP(n queens problem)
+import random
+
+n = 8
+
+def conflicts(board, col, row):
+    count = 0
+
+    for c in range(n):
+        if c == col:
+            continue
+
+        if board[c] == row:
+            count += 1
+
+        if abs(board[c] - row) == abs(c - col):
+            count += 1
+
+    return count
+
+
+def local_search():
+    for restart in range(100):
+
+        board = [random.randint(0, n - 1) for _ in range(n)]
+
+        for _ in range(1000):
+
+            conflicted = []
+
+            for col in range(n):
+                if conflicts(board, col, board[col]) > 0:
+                    conflicted.append(col)
+
+            if not conflicted:
+                return board
+
+            col = random.choice(conflicted)
+
+            best_rows = []
+            min_conflicts = n
+
+            for row in range(n):
+                current = conflicts(board, col, row)
+
+                if current < min_conflicts:
+                    min_conflicts = current
+                    best_rows = [row]
+
+                elif current == min_conflicts:
+                    best_rows.append(row)
+
+            board[col] = random.choice(best_rows)
+
+    return None
+
+
+board = local_search()
+
+if board:
+    print("Solution Found:")
+
+    for row in range(n):
+        for col in range(n):
+            if board[col] == row:
+                print("Q", end=" ")
+            else:
+                print(".", end=" ")
+        print()
+else:
+    print("No solution found")
+     
