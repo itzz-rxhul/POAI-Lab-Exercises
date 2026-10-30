@@ -1,0 +1,197 @@
+
+CLASSES = {
+    "Flu": {
+        "prior": 0.30,
+        "symptoms": {
+            "fever": 0.90,
+            "cough": 0.80,
+            "sneezing": 0.20,
+        },
+    },
+    "Cold": {
+        "prior": 0.40,
+        "symptoms": {
+            "fever": 0.30,
+            "cough": 0.70,
+            "sneezing": 0.80,
+        },
+    },
+    "Allergy": {
+        "prior": 0.30,
+        "symptoms": {
+            "fever": 0.05,
+            "cough": 0.30,
+            "sneezing": 0.90,
+        },
+    },
+}
+
+
+def diagnose(observed_symptoms):
+    """
+    Calculate posterior probabilities using Naive Bayes.
+
+    observed_symptoms is a dictionary such as:
+        {"fever": True, "cough": True, "sneezing": False}
+    """
+    scores = {}
+
+    for disease, data in CLASSES.items():
+        probability = data["prior"]
+
+        for symptom, present in observed_symptoms.items():
+            p_present = data["symptoms"][symptom]
+            likelihood = p_present if present else (1 - p_present)
+            probability *= likelihood
+
+        scores[disease] = probability
+
+    total = sum(scores.values())
+    if total == 0:
+        raise ValueError("Evidence probabilities sum to zero.")
+
+    posterior = {
+        disease: (score / total) * 100
+        for disease, score in scores.items()
+    }
+
+    prediction = max(posterior, key=posterior.get)
+    return prediction, posterior
+
+
+def run_test_case(case_name, symptoms):
+    print(f"\n{case_name}")
+    print("Observed symptoms:", symptoms)
+
+    prediction, probabilities = diagnose(symptoms)
+
+    print("Posterior probabilities:")
+    for disease, probability in probabilities.items():
+        print(f"  {disease}: {probability:.2f}%")
+
+    print("Most likely result:", prediction)
+
+
+if __name__ == "__main__":
+    # Test case 1: Fever and cough, but no sneezing
+    run_test_case(
+        "TEST CASE 1",
+        {"fever": True, "cough": True, "sneezing": False},
+    )
+
+    # Test case 2: Sneezing and cough, but no fever
+    run_test_case(
+        "TEST CASE 2",
+        {"fever": False, "cough": True, "sneezing": True},
+    )
+
+    # Test case 3: Sneezing only
+    run_test_case(
+        "TEST CASE 3",
+        {"fever": False, "cough": False, "sneezing": True},
+    )
+
+def triangular_membership(x, a, b, c):
+    """Return membership degree for a triangular fuzzy set."""
+    if x < a or x > c:
+        return 0.0
+    if x == b:
+        return 1.0
+    if x < b:
+        return (x - a) / (b - a) if b != a else 1.0
+    return (c - x) / (c - b) if c != b else 1.0
+
+
+def temperature_memberships(temp):
+    return {
+        "low": triangular_membership(temp, 0, 0, 50),
+        "medium": triangular_membership(temp, 25, 50, 75),
+        "high": triangular_membership(temp, 50, 100, 100),
+    }
+
+
+def vibration_memberships(vibration):
+    return {
+        "low": triangular_membership(vibration, 0, 0, 5),
+        "high": triangular_membership(vibration, 2, 10, 10),
+    }
+
+
+def fan_membership(speed, label):
+    sets = {
+        "slow": (0, 0, 50),
+        "medium": (25, 50, 75),
+        "fast": (50, 100, 100),
+    }
+    return triangular_membership(speed, *sets[label])
+
+
+def infer_fan_speed(temp, vibration):
+    """
+    Rules:
+      1. IF temperature is low AND vibration is low, fan is slow.
+      2. IF temperature is medium, fan is medium.
+      3. IF temperature is high, fan is fast.
+      4. IF vibration is high, fan is fast.
+
+    AND is implemented using min; rule aggregation uses max.
+    """
+    if not (0 <= temp <= 100):
+        raise ValueError("Temperature must be between 0 and 100.")
+    if not (0 <= vibration <= 10):
+        raise ValueError("Vibration must be between 0 and 10.")
+
+    t = temperature_memberships(temp)
+    v = vibration_memberships(vibration)
+
+    rules = [
+        (min(t["low"], v["low"]), "slow"),
+        (t["medium"], "medium"),
+        (t["high"], "fast"),
+        (v["high"], "fast"),
+    ]
+
+    # Aggregate the clipped output membership functions.
+    output_points = []
+    step = 1
+    for speed in range(0, 101, step):
+        membership = 0.0
+        for strength, output_label in rules:
+            clipped = min(strength, fan_membership(speed, output_label))
+            membership = max(membership, clipped)
+        output_points.append((speed, membership))
+
+    # Centroid defuzzification.
+    numerator = sum(x * degree for x, degree in output_points)
+    denominator = sum(degree for _, degree in output_points)
+
+    if denominator == 0:
+        return 0.0
+
+    return numerator / denominator
+
+
+def run_test_case(case_name, temperature, vibration):
+    fan_speed = infer_fan_speed(temperature, vibration)
+    print(f"\n{case_name}")
+    print(f"Machine temperature: {temperature} C")
+    print(f"Vibration level: {vibration}/10")
+    print(f"Recommended fan speed: {fan_speed:.2f}%")
+
+    if fan_speed < 35:
+        print("Fan status: SLOW")
+    elif fan_speed < 70:
+        print("Fan status: MEDIUM")
+    else:
+        print("Fan status: FAST")
+
+
+if __name__ == "__main__":
+    # Test case 1: Cool machine and low vibration
+    run_test_case("TEST CASE 1", temperature=20, vibration=1)
+
+    # Test case 2: Moderate temperature and vibration
+    run_test_case("TEST CASE 2", temperature=55, vibration=3)
+
+    # Test case 3: High temperature and high vibration
+    run_test_case("TEST CASE 3", temperature=90, vibration=8)
